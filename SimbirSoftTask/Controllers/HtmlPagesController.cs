@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SimbirSoftTask.Dto;
 using SimbirSoftTask.Services;
+using System.Threading.Tasks;
 
 namespace SimbirSoftTask.Controllers
 {
@@ -16,9 +17,9 @@ namespace SimbirSoftTask.Controllers
         }
 
         [HttpPost("count-of-words")]
-        public FileWordsDto GetWordsCountsByUrl(string url)
+        public async Task<FileWordsDto> GetWordsCountsByUrl(string url)
         {
-            var dto = _pageService.GetWordsCountsByUrl(url);
+            var dto = await _pageService.GetWordsCountsByUrl(url);
 
             return dto;
         }

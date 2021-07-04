@@ -15,6 +15,6 @@ namespace SimbirSoftTask.Dto
         /// <summary>
         /// Слова и их количество
         /// </summary>
-        public Dictionary<string, int> Words { get; set; }
+        public List<WordDto> Words { get; set; }
     }
 }

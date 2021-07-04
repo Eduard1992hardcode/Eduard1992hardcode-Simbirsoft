@@ -22,7 +22,7 @@ namespace SimbirSoftTask.Services
 
             try
             {
-                client.DownloadFile(new Uri(url), path);
+                client.DownloadFile(url, path);
                 return path;
             }
             catch (Exception)

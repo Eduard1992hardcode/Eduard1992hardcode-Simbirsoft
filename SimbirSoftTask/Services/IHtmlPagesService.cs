@@ -1,4 +1,5 @@
 ﻿using SimbirSoftTask.Dto;
+using System.Threading.Tasks;
 
 namespace SimbirSoftTask.Services
 {
@@ -12,6 +13,6 @@ namespace SimbirSoftTask.Services
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        FileWordsDto GetWordsCountsByUrl(string url);
+        Task<FileWordsDto> GetWordsCountsByUrl(string url);
     }
 }

@@ -1,7 +1,8 @@
 ﻿using HtmlAgilityPack;
+using SimbirSoftTask.Data;
 using SimbirSoftTask.Dto;
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SimbirSoftTask.Services
 {
@@ -10,15 +11,18 @@ namespace SimbirSoftTask.Services
     /// </summary>
     public class HtmlPagesService : IHtmlPagesService
     {
+        private readonly DataContext _context;
         private readonly IFileService _fileService;
+        private readonly ICheckedSiteService _checkedSiteService;
 
         /// <summary>
         /// Конструктор
         /// </summary>
         /// <param name="fileService"></param>
-        public HtmlPagesService(IFileService fileService)
+        public HtmlPagesService(IFileService fileService, ICheckedSiteService checkedSiteService)
         {
             _fileService = fileService;
+            _checkedSiteService = checkedSiteService;
         }
 
         /// <summary>
@@ -26,7 +30,7 @@ namespace SimbirSoftTask.Services
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public FileWordsDto GetWordsCountsByUrl(string url)
+        public async Task<FileWordsDto> GetWordsCountsByUrl(string url)
         {
             var path = _fileService.LoadSiteContent(url);
             var htmlDoc = new HtmlDocument();
@@ -38,14 +42,14 @@ namespace SimbirSoftTask.Services
             var words = text.Split(' ', ',', '.', '!', '?', '"', ';', ':', '[', ']', '(', ')', '\n', '\r', '\t');
 
             var wordsCount = new Dictionary<string, int>();
-
+            
             foreach (var word in words)
             {
                 if (string.IsNullOrEmpty(word))
                     continue;
 
                 if (!wordsCount.ContainsKey(word))
-                    wordsCount.Add(word, 1);
+                           wordsCount.Add(word, 1);
 
                 else
                     wordsCount[word] += 1;
@@ -53,11 +57,23 @@ namespace SimbirSoftTask.Services
 
             _fileService.RemoveFile(path);
 
-            return new FileWordsDto()
+            var dto = new FileWordsDto()
             {
                 URL = url,
-                Words = wordsCount
+                Words = CreateWordDtos(wordsCount)
             };
+            await _checkedSiteService.AddSite(dto);
+            return dto;
+        }
+
+        private List<WordDto> CreateWordDtos(Dictionary<string, int> wordsCount)
+        {
+            var words = new List<WordDto>();
+            foreach (var w in wordsCount)
+            {
+                words.Add(new WordDto {Name = w.Key, Count = w.Value });
+            }
+            return words;
         }
     }
 }
